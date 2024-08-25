@@ -19,10 +19,36 @@ app.get("/", function (req, res) {
 });
 
 
-// your first API endpoint... 
-app.get("/api/hello", function (req, res) {
-  res.json({greeting: 'hello API'});
+app.get("/api/:date?", function (req, res) { // Notice the "?" after ":date" to make it optional
+  let dateString = req.params.date;
+  let date;
+
+  // If dateString is not provided, return the current date
+  if (!dateString) {
+    date = new Date();
+  } else {
+    // Check if the dateString is a valid Unix timestamp (all digits)
+    if (!isNaN(dateString) && dateString.length === 13) { // Length check for milliseconds
+      date = new Date(parseInt(dateString)); // Convert to integer and create Date
+    } else {
+      date = new Date(dateString);
+    }
+
+    // If date is invalid, return an error object
+    if (isNaN(date.getTime())) {
+      return res.json({
+        error: "Invalid Date"
+      });
+    }
+  }
+
+  // Return the date in unix and utc format
+  res.json({
+    unix: date.getTime(),
+    utc: date.toUTCString()
+  });
 });
+
 
 
 
